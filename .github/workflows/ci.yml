@@ -1,0 +1,52 @@
+name: CI - Next.js + NestJS with ClickUp Chat Room
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      # Frontend (Next.js)
+      - name: Install frontend deps
+        run: npm install --prefix frontend
+      - name: Build frontend
+        run: npm run build --prefix frontend
+
+      # Backend (NestJS)
+      - name: Install backend deps
+        run: npm install --prefix backend
+      - name: Build backend
+        run: npm run build --prefix backend
+
+      # Notify ClickUp Chat - Success
+      - name: Notify ClickUp Chat - Success
+        if: success()
+        run: |
+          curl -X POST "https://api.clickup.com/api/v2/room/${{ secrets.CLICKUP_ROOM_ID }}/message" \
+          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"content\":\"✅ CI Passed for commit $GITHUB_SHA on branch $GITHUB_REF. See run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
+
+      # Notify ClickUp Chat - Failure
+      - name: Notify ClickUp Chat - Failure
+        if: failure()
+        run: |
+          curl -X POST "https://api.clickup.com/api/v2/room/${{ secrets.CLICKUP_ROOM_ID }}/message" \
+          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"content\":\"❌ CI Failed for commit $GITHUB_SHA on branch $GITHUB_REF. See run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
