@@ -35,7 +35,10 @@ jobs:
               "tags": [
                 "pr"
               ],
-              "notify_all": true
+              "notify_all": true,
+              "group_assignees": [
+                "${{ vars.CLICKUP_PR_APPROVERS }}"
+              ]
             }'
 
   build:
