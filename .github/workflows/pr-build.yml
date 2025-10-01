@@ -16,6 +16,11 @@ jobs:
       - name: Notify PR opened
         if: github.event.action == 'opened' || github.event.action == 'synchronize'
         run: |
+          REVIEWERS=$(jq -r '.pull_request.requested_reviewers[]?.login' <<< '${{ toJson(github.event) }}' | xargs)
+          if [ -z "$REVIEWERS" ]; then
+            REVIEWERS="(none)"
+          fi
+
           curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
           -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
           -H "Content-Type: application/json" \
@@ -26,28 +31,29 @@ jobs:
                 "id": "458876",
                 "name": "Update"
               },
-              "title": "🔀 PR opened from branch `${{ github.head_ref }}` → `${{ github.base_ref }}`"
+              "title": "🔀 Pull Request Opened [ ${{ github.event.pull_request.title }} ]"
             },
-            "content": "[View PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
+            "content": "📦 **Repository:** ${{ github.repository }}\n🌱 **Source Branch:** ${{ github.head_ref }}\n🎯 **Target Branch:** ${{ github.base_ref }}\n📝 **Title:** *${{ github.event.pull_request.title }}*\n👤 **Author:** ${{ github.actor }}\n👥 **Reviewers:** $REVIEWERS\n\n🔗 [View PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
           }'
-      - name: Create Clickup Task
-        if: github.event.action == 'opened' || github.event.action == 'synchronize'
-        run: |
-          curl -X POST "https://api.clickup.com/api/v2/list/${{ vars.CLICKUP_LIST }}/task" \
-          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d '
-            {
-              "name": "PR `${{ github.head_ref }}` → `${{ github.base_ref }}`",
-              "description": "[View PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})",
-              "tags": [
-                "pr"
-              ],
-              "notify_all": true,
-              "group_assignees": [
-                "${{ vars.CLICKUP_PR_APPROVERS }}"
-              ]
-            }'
+#            "content": "**Repository:** ${{ github.repository }}\n**Pull Request:** [ #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
+#      - name: Create Clickup Task
+#        if: github.event.action == 'opened' || github.event.action == 'synchronize'
+#        run: |
+#          curl -X POST "https://api.clickup.com/api/v2/list/${{ vars.CLICKUP_LIST }}/task" \
+#          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
+#          -H "Content-Type: application/json" \
+#          -d '
+#            {
+#              "name": "PR `${{ github.head_ref }}` → `${{ github.base_ref }}`",
+#              "description": "[View PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})",
+#              "tags": [
+#                "pr"
+#              ],
+#              "notify_all": true,
+#              "group_assignees": [
+#                "${{ vars.CLICKUP_PR_APPROVERS }}"
+#              ]
+#            }'
 
   build:
     runs-on: ubuntu-latest
@@ -82,9 +88,9 @@ jobs:
                     "id": "458876",
                     "name": "Update"
                   },
-                  "title": "✅ **CI Passed** - Build"
+                  "title": "✅ CI Build Passed"
                 },
-                "content": "**Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "content": "📦 **Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
               }'
           
@@ -102,8 +108,8 @@ jobs:
                     "id": "458876",
                     "name": "Update"
                   },
-                  "title": "❌ **CI Failed** - Build"
+                  "title": "❌ CI Build Failed"
                 },
-                "content": "**Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "content": "📦 **Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
               }'
