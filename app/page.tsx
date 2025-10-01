@@ -16,6 +16,7 @@ export default function HomePage() {
     <div>
       <p>API Response:</p>
       <p>Jep Jep</p>
+      <p>Jep 2</p>
       <pre>{message}</pre>
     </div>
   );
