@@ -37,4 +37,4 @@ jobs:
                 "content": "✅ Frontend build successful on branch ${{ github.ref_name }}",
                 "notify_all": true
               }' \
-          "https://api.clickup.com/api/v2/room/<CHAT_ID>/message"
+          "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages"
