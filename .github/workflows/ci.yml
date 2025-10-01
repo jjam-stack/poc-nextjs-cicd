@@ -37,14 +37,7 @@ jobs:
           -H "Content-Type: application/json" \
           -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
           -d '{
-                "type": "message",,
-                "content_format": "text/md",
-                "post_data": {
-                    "title": "the title",
-                    "subtype": {
-                        "id": "a subtype"
-                    }
-                },
+                "type": "message",
                 "content": "✅ **CI Passed**\n\n**Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
               }'
