@@ -37,8 +37,15 @@ jobs:
           -H "Content-Type: application/json" \
           -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
           -d '{
-                "type": "message",
-                "content": "✅ CI Passed for commit ${{ github.sha }} on branch ${{ github.ref_name }}. See run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                "type": "message",,
+                "content_format": "text/md",
+                "post_data": {
+                    "title": "the title",
+                    "subtype": {
+                        "id": "a subtype"
+                    }
+                },
+                "content": "✅ **CI Passed**\n\n**Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
               }'
           
@@ -52,6 +59,6 @@ jobs:
           -H "Content-Type: application/json" \
           -d '{
                 "type": "message",
-                "content": "❌ CI Failed for commit ${{ github.sha }} on branch ${{ github.ref_name }}. See run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                "content": "❌ **CI Failed**\n\n**Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
               }'
