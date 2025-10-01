@@ -1,15 +1,31 @@
-name: Frontend CI/CD
+name: Notify & Build on PR
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - develop
+      - qa
+      - uat
+      - psup
+      - main
 
 jobs:
+  notify-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify PR opened
+        if: github.event.action == 'opened' || github.event.action == 'synchronize'
+        run: |
+          curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
+          -H "Authorization: ${{ secrets.CLICKUP_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "content": "🔀 PR opened targeting `${{ github.base_ref }}`\n[View PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
+          }'
+
   build:
     runs-on: ubuntu-latest
-
+    needs: notify-pr
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -26,9 +42,6 @@ jobs:
       - name: Build Next.js
         run: npm run build
 
-      #- name: Run tests
-      #  run: npm test
-
       # Notify ClickUp Chat - Success
       - name: Notify ClickUp Chat - Success
         if: success()
@@ -41,7 +54,6 @@ jobs:
                 "content": "✅ **CI Passed**\n\n**Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
               }'
-          
           
       # Notify ClickUp Chat - Failure
       - name: Notify ClickUp Chat - Failure

@@ -1,0 +1,21 @@
+name: Notify on Feature/Hotfix/Bugfix Push
+
+on:
+  push:
+    branches:
+      - "feature/*"
+      - "hotfix/*"
+      - "bugfix/*"
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification to ClickUp Chat
+        run: |
+          curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
+          -H "Authorization: ${{ secrets.CLICKUP_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "content": "📌 Push detected on branch `${{ github.ref_name }}` by `${{ github.actor }}`\nRepo: `${{ github.repository }}`\nCommit: `${{ github.sha }}`"
+          }'

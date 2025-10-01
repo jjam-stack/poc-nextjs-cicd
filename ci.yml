@@ -1,0 +1,79 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: 
+      - "feature/*"
+      - "hotfix/*"
+      - "bugfix/*"
+      - develop
+      - qa
+      - uat
+      - psup
+  pull_request:
+    branches: 
+      - develop
+      - qa
+      - uat
+      - psup
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment for Production Deploy"
+        required: true
+        default: "main"
+
+env:
+  GCP_PROJECT_NAME: ${{ secrets.GCP_PROJECT_NAME }}
+  GCP_REGION: ${{ secrets.GCP_REGION }}
+  GCP_SA_KEY_BASE64: ${{ secrets.GCP_SA_KEY_BASE64 }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Next.js
+        run: npm run build
+
+      #- name: Run tests
+      #  run: npm test
+
+      # Notify ClickUp Chat - Success
+      - name: Notify ClickUp Chat - Success
+        if: success()
+        run: |
+          curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
+          -d '{
+                "type": "message",
+                "content": "✅ **CI Passed**\n\n**Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "notify_all": true
+              }'
+          
+          
+      # Notify ClickUp Chat - Failure
+      - name: Notify ClickUp Chat - Failure
+        if: failure()
+        run: |
+          curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
+          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "type": "message",
+                "content": "❌ **CI Failed**\n\n**Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "notify_all": true
+              }'
