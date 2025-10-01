@@ -17,6 +17,7 @@ export default function HomePage() {
       <p>API Response:</p>
       <p>Jep Jep</p>
       <p>Jep 2</p>
+      <p>Japhet test</p>
       <pre>{message}</pre>
     </div>
   );
