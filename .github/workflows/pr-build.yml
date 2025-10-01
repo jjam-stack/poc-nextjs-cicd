@@ -17,7 +17,7 @@ jobs:
         if: github.event.action == 'opened' || github.event.action == 'synchronize'
         run: |
           curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
-          -H "Authorization: ${{ secrets.CLICKUP_TOKEN }}" \
+          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
           -H "Content-Type: application/json" \
           -d '{
             "content": "🔀 PR opened targeting `${{ github.base_ref }}`\n[View PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
