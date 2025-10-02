@@ -8,6 +8,16 @@ on:
       - uat
       - psup
       - main
+    types: 
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  pull_request_target:
+    types: 
+      - edited
+      - review_requested
+      - review_request_removed
 
 
 jobs:
@@ -15,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Notify PR opened
-        if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.action == 'reopened' || github.event.action == 'ready_for_review' 
+        #if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.action == 'reopened' || github.event.action == 'ready_for_review' 
         run: |
           
           ACTION="${{ github.event.action }}"
