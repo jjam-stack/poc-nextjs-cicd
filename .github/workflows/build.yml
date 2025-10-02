@@ -8,6 +8,9 @@ on:
       - uat
       - psup
       - main
+    types: 
+      - opened
+      - synchronize
 
 jobs:
   build:
