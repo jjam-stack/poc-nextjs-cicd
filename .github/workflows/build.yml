@@ -36,7 +36,7 @@ jobs:
           -H "Content-Type: application/json" \
           -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
           -d '{
-                "type": "post",
+                "type": "message",
                 "post_data": {
                   "subtype": {
                     "id": "458876",
@@ -44,7 +44,7 @@ jobs:
                   },
                   "title": "✅ CI Build Passed"
                 },
-                "content": "📦 **Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "content": "✅ **CI Build Passed**\n\n📦 **Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
               }'
           
@@ -56,7 +56,7 @@ jobs:
           -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
           -H "Content-Type: application/json" \
           -d '{
-                "type": "post",
+                "type": "message",
                 "post_data": {
                   "subtype": {
                     "id": "458876",
@@ -64,6 +64,6 @@ jobs:
                   },
                   "title": "❌ CI Build Failed"
                 },
-                "content": "📦 **Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "content": "❌ **CI Build Failed**\n\n📦 **Repository:** ${{ github.repository }}\n**Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
               }'

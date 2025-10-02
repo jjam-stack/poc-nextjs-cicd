@@ -17,7 +17,7 @@ jobs:
           -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
           -H "Content-Type: application/json" \
           -d '{
-            "type": "post",
+            "type": "message",
             "post_data": {
               "subtype": {
                 "id": "458876",
@@ -25,5 +25,5 @@ jobs:
               },
               "title": "📌 Push Detected"
             },
-            "content": "📦 **Repository:** ${{ github.repository }}\n🌱 **Branch:** ${{ github.ref_name }}\n📝 **Commit:** ${{ github.sha }}\n👤 **Pushed by:** ${{ github.actor }}\n\n🔗 [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})"
+            "content": "📌 **Push Detected**\n\n📦 **Repository:** ${{ github.repository }}\n🌱 **Branch:** ${{ github.ref_name }}\n📝 **Commit:** ${{ github.sha }}\n👤 **Pushed by:** ${{ github.actor }}\n\n🔗 [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})"
           }'
