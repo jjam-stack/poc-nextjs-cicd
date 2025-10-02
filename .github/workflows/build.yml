@@ -44,7 +44,7 @@ jobs:
                   },
                   "title": "✅ CI Build Passed"
                 },
-                "content": "* * *\n## ✅ **CI Build Passed**\n\n📦 **Repository:** ${{ github.repository }}\n🌱 **Branch:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "content": "* * *\n## ✅ **CI Build Passed**\n\n 📦 **Repository:** ${{ github.repository }}\n 🌱 **Branch:** ${{ github.ref_name }}\n 📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n 🔫 **Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
               }'
           
@@ -64,6 +64,6 @@ jobs:
                   },
                   "title": "❌ CI Build Failed"
                 },
-                "content": "* * *\n## ❌ **CI Build Failed**\n\n📦 **Repository:** ${{ github.repository }}\n🌱 **Branch:** ${{ github.ref_name }}\n📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n🔫 **Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "content": "* * *\n## ❌ **CI Build Failed**\n\n 📦 **Repository:** ${{ github.repository }}\n 🌱 **Branch:** ${{ github.ref_name }}\n 📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n 🔫 **Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
               }'
