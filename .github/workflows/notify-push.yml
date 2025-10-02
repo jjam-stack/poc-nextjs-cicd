@@ -25,5 +25,5 @@ jobs:
               },
               "title": "📌 Push Detected"
             },
-            "content": "📌 **Push Detected**\n\n📦 **Repository:** ${{ github.repository }}\n🌱 **Branch:** ${{ github.ref_name }}\n📝 **Commit:** ${{ github.sha }}\n👤 **Pushed by:** ${{ github.actor }}\n\n🔗 [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})"
+            "content": "## 📌 **Push Detected**\n\n📦 **Repository:** ${{ github.repository }}\n🌱 **Branch:** ${{ github.ref_name }}\n📝 **Commit:** ${{ github.sha }}\n👤 **Pushed by:** ${{ github.actor }}\n\n🔗 [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})"
           }'
