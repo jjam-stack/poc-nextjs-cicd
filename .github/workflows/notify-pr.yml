@@ -65,7 +65,7 @@ jobs:
               "title": "🔀 Pull Request '"$LABEL"' [ ${{ github.event.pull_request.title }} ]"
             },
             '"$EXTRA_FIELD"'
-            "content": "* * *\n## 🔀 **Pull Request '"$LABEL"' [ ${{ github.event.pull_request.title }} ]**\n\n 📦 **Repository:** ${{ github.repository }}\n 🌱 **Source Branch:** ${{ github.head_ref }}\n 🎯 **Target Branch:** ${{ github.base_ref }}\n 📝 **Title:** *${{ github.event.pull_request.title }}*\n 👤 **Author:** ${{ github.actor }}\n 👥 **Reviewers:** '"$REVIEWERS"'\n\n🔗 [View PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
+            "content": "* * *\n## 🔀 **Pull Request '"$LABEL"' [ ${{ github.event.pull_request.title }} ]**\n\n 📦 **Repository:** ${{ github.repository }}\n 🌱 **Source Branch:** ${{ github.head_ref }}\n 🎯 **Target Branch:** ${{ github.base_ref }}\n 📝 **Title:** *${{ github.event.pull_request.title }}*\n 👤 **Author:** ${{ github.actor }}\n 👥 **Reviewers:** '"$REVIEWERS"''"$EXTRA_CONTENT"'\n\n🔗 [View PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
           }'
           echo "$PAYLOAD"
           curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
