@@ -1,0 +1,96 @@
+name: Notify on Pull Request Event
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - qa
+      - uat
+      - psup
+      - main
+    types: 
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - edited
+      - review_requested
+      - review_request_removed
+
+
+jobs:
+  notify-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify PR
+        if: github.event.pull_request.state == 'open'
+        #if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.action == 'reopened' || github.event.action == 'ready_for_review' 
+        run: |
+          
+          EXTRA_FIELD=""
+          EXTRA_CONTENT=""
+          ACTION="${{ github.event.action }}"
+          if [ "$ACTION" = "opened" ]; then
+            LABEL="Opened"
+            EXTRA_FIELD="\"group_assignee\": \"${{ vars.CLICKUP_PR_APPROVERS }}\","
+          elif [ "$ACTION" = "synchronize" ]; then
+            LABEL="Updated"
+          elif [ "$ACTION" = "reopened" ]; then
+            LABEL="Reopened"
+            EXTRA_FIELD="\"group_assignee\": \"${{ vars.CLICKUP_PR_APPROVERS }}\","
+            EXTRA_CONTENT="\n 💬 **Comment:** ${{ github.event.pull_request.body }}"
+          elif [ "$ACTION" = "ready_for_review" ]; then
+            LABEL="Ready for Review"
+          elif [ "$ACTION" = "edited" ]; then
+            LABEL="Modified"
+          elif [ "$ACTION" = "review_requested" ]; then
+            LABEL="Added Reviewer"
+          elif [ "$ACTION" = "review_request_removed" ]; then
+            LABEL="Removed Reviewer"
+          else
+            LABEL="Event"
+          fi
+          REVIEWERS=$(jq -r '.pull_request.requested_reviewers[]?.login' <<< '${{ toJson(github.event) }}' | xargs)
+          if [ -z "$REVIEWERS" ]; then
+            REVIEWERS="(none)"
+          fi
+
+          PAYLOAD='{
+            "type": "message",
+            "post_data": {
+              "subtype": {
+                "id": "458876",
+                "name": "Update"
+              },
+              "title": "🔀 Pull Request '"$LABEL"' [ ${{ github.event.pull_request.title }} ]"
+            },
+            '"$EXTRA_FIELD"'
+            "content": "* * *\n## 🔀 **Pull Request '"$LABEL"' [ ${{ github.event.pull_request.title }} ]**\n\n 📦 **Repository:** ${{ github.repository }}\n 🌱 **Source Branch:** ${{ github.head_ref }}\n 🎯 **Target Branch:** ${{ github.base_ref }}\n 📝 **Title:** *${{ github.event.pull_request.title }}*\n 👤 **Author:** ${{ github.actor }}\n 👥 **Reviewers:** '"$REVIEWERS"''"$EXTRA_CONTENT"'\n\n🔗 [View PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
+          }'
+          echo "$PAYLOAD"
+          curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
+          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "$PAYLOAD"
+
+
+          
+#            "content": "**Repository:** ${{ github.repository }}\n**Pull Request:** [ #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
+#      - name: Create Clickup Task
+#        if: github.event.action == 'opened' || github.event.action == 'synchronize'
+#        run: |
+#          curl -X POST "https://api.clickup.com/api/v2/list/${{ vars.CLICKUP_LIST }}/task" \
+#          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
+#          -H "Content-Type: application/json" \
+#          -d '
+#            {
+#              "name": "PR `${{ github.head_ref }}` → `${{ github.base_ref }}`",
+#              "description": "[View PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})",
+#              "tags": [
+#                "pr"
+#              ],
+#              "notify_all": true,
+#              "group_assignees": [
+#                "${{ vars.CLICKUP_PR_APPROVERS }}"
+#              ]
+#            }'
