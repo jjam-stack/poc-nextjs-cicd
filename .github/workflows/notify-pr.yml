@@ -30,12 +30,12 @@ jobs:
           ACTION="${{ github.event.action }}"
           if [ "$ACTION" = "opened" ]; then
             LABEL="Opened"
-            EXTRA_FIELD="\"group_assignee\": \"${CLICKUP_PR_APPROVERS}\","
+            EXTRA_FIELD="\"group_assignee\": \"${{ vars.CLICKUP_PR_APPROVERS }}\","
           elif [ "$ACTION" = "synchronize" ]; then
             LABEL="Updated"
           elif [ "$ACTION" = "reopened" ]; then
             LABEL="Reopened"
-            EXTRA_FIELD="\"group_assignee\": \"${CLICKUP_PR_APPROVERS}\","
+            EXTRA_FIELD="\"group_assignee\": \"${{ vars.CLICKUP_PR_APPROVERS }}}\","
           elif [ "$ACTION" = "ready_for_review" ]; then
             LABEL="Ready for Review"
           elif [ "$ACTION" = "edited" ]; then
