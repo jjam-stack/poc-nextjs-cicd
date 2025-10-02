@@ -13,8 +13,6 @@ on:
       - synchronize
       - reopened
       - ready_for_review
-  pull_request_target:
-    types: 
       - edited
       - review_requested
       - review_request_removed
