@@ -35,6 +35,12 @@ jobs:
             LABEL="Reopened"
           elif [ "$ACTION" = "ready_for_review" ]; then
             LABEL="Ready for Review"
+          elif [ "$ACTION" = "edited" ]; then
+            LABEL="Modified"
+          elif [ "$ACTION" = "review_requested" ]; then
+            LABEL="Added Reviewer"
+          elif [ "$ACTION" = "review_request_removed" ]; then
+            LABEL="Removed Reviewer"
           else
             LABEL="Event"
           fi
