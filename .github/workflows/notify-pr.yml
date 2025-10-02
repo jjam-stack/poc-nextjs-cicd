@@ -28,6 +28,7 @@ jobs:
         run: |
           
           EXTRA_FIELD=""
+          EXTRA_CONTENT=""
           ACTION="${{ github.event.action }}"
           if [ "$ACTION" = "opened" ]; then
             LABEL="Opened"
@@ -36,7 +37,8 @@ jobs:
             LABEL="Updated"
           elif [ "$ACTION" = "reopened" ]; then
             LABEL="Reopened"
-            EXTRA_FIELD="\"group_assignee\": \"${{ vars.CLICKUP_PR_APPROVERS }}}\","
+            EXTRA_FIELD="\"group_assignee\": \"${{ vars.CLICKUP_PR_APPROVERS }}\","
+            EXTRA_CONTENT="\n 💬 **Comment:** ${{ github.event.pull_request.body }}"
           elif [ "$ACTION" = "ready_for_review" ]; then
             LABEL="Ready for Review"
           elif [ "$ACTION" = "edited" ]; then
