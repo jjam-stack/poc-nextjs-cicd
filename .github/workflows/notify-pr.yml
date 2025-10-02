@@ -1,4 +1,4 @@
-name: Notify PR
+name: Notify on Pull Request Event
 
 on:
   pull_request:
