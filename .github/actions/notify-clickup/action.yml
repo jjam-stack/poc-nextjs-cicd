@@ -4,12 +4,9 @@ description: "Send a message to ClickUp chat"
 inputs:
   msg:
     description: "The message text to send"
-    type: string
     required: true
   is_assign:
     description: "The flag if this will be assigned to PR approvers"
-    type: boolean
-    default: false
     required: false
 
 runs:
