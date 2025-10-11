@@ -49,10 +49,10 @@ jobs:
             🔫 **Triggered by:** ${{ github.actor }}
             🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           is_assign: false
-          CLICKUP_API_TOKEN: $CLICKUP_API_TOKEN
-          CLICKUP_TEAM_ID: $CLICKUP_TEAM_ID
-          CLICKUP_ROOM_ID: $CLICKUP_ROOM_ID
-          CLICKUP_PR_APPROVERS: $CLICKUP_PR_APPROVERS
+          CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
+          CLICKUP_TEAM_ID: ${{ env.CLICKUP_TEAM_ID }}
+          CLICKUP_ROOM_ID: ${{ env.CLICKUP_ROOM_ID }}
+          CLICKUP_PR_APPROVERS: ${{ env.CLICKUP_PR_APPROVERS }}
 
       - name: Notify ClickUp Build Failed
         if: failure()
@@ -67,10 +67,11 @@ jobs:
             🔫 **Triggered by:** ${{ github.actor }}
             🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           is_assign: false
-          CLICKUP_API_TOKEN: $CLICKUP_API_TOKEN
-          CLICKUP_TEAM_ID: $CLICKUP_TEAM_ID
-          CLICKUP_ROOM_ID: $CLICKUP_ROOM_ID
-          CLICKUP_PR_APPROVERS: $CLICKUP_PR_APPROVERS
+          CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
+          CLICKUP_TEAM_ID: ${{ env.CLICKUP_TEAM_ID }}
+          CLICKUP_ROOM_ID: ${{ env.CLICKUP_ROOM_ID }}
+          CLICKUP_PR_APPROVERS: ${{ env.CLICKUP_PR_APPROVERS }}
+
       - name: Deploy to Cloud Run [${{ inputs.environment }}]
         run: |
           echo "🚀 Deploying to Cloud Run..."
@@ -83,7 +84,7 @@ jobs:
             --timeout ${{ vars.TIMEOUT_SECONDS }}s \
             --min-instances ${{ vars.MIN_INSTANCES }} \
             --max-instances ${{ vars.MAX_INSTANCES }} \
-            --set-env-vars-file=${{ vars.APP_ENV_FILE }}"
+            --env-vars-file ${{ vars.APP_ENV_FILE }}"
 
           if [ "${{ vars.GCP_IS_PUBLIC }}" = true ]; then
             CMD="$CMD --allow-unauthenticated"
@@ -104,10 +105,10 @@ jobs:
             🔫 **Triggered by:** ${{ github.actor }}
             🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           is_assign: false
-          CLICKUP_API_TOKEN: $CLICKUP_API_TOKEN
-          CLICKUP_TEAM_ID: $CLICKUP_TEAM_ID
-          CLICKUP_ROOM_ID: $CLICKUP_ROOM_ID
-          CLICKUP_PR_APPROVERS: $CLICKUP_PR_APPROVERS
+          CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
+          CLICKUP_TEAM_ID: ${{ env.CLICKUP_TEAM_ID }}
+          CLICKUP_ROOM_ID: ${{ env.CLICKUP_ROOM_ID }}
+          CLICKUP_PR_APPROVERS: ${{ env.CLICKUP_PR_APPROVERS }}
 
       - name: Notify ClickUp Deploy Failed
         if: failure()
@@ -121,7 +122,7 @@ jobs:
             🔫 **Triggered by:** ${{ github.actor }}
             🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           is_assign: false
-          CLICKUP_API_TOKEN: $CLICKUP_API_TOKEN
-          CLICKUP_TEAM_ID: $CLICKUP_TEAM_ID
-          CLICKUP_ROOM_ID: $CLICKUP_ROOM_ID
-          CLICKUP_PR_APPROVERS: $CLICKUP_PR_APPROVERS
+          CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
+          CLICKUP_TEAM_ID: ${{ env.CLICKUP_TEAM_ID }}
+          CLICKUP_ROOM_ID: ${{ env.CLICKUP_ROOM_ID }}
+          CLICKUP_PR_APPROVERS: ${{ env.CLICKUP_PR_APPROVERS }}
