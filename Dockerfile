@@ -15,6 +15,8 @@ RUN npm run build
 
 # Stage 2: Serve static files with Nginx
 FROM nginx:alpine
+WORKDIR /app
+
 # Remove default Nginx static content
 RUN rm -rf /usr/share/nginx/html/*
 
@@ -22,8 +24,12 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder /app/.next /usr/share/nginx/html
 COPY --from=builder /app/public /usr/share/nginx/html
 
-# Expose port
+# Expose the Cloud Run port
+ENV PORT 8080
 EXPOSE 8080
+
+# Update Nginx config to listen on $PORT
+RUN sed -i "s/listen       80;/listen       ${PORT};/" /etc/nginx/conf.d/default.conf
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
