@@ -10,3 +10,5 @@ jobs:
     uses: ./.github/workflows/gcp-build-and-deploy.yml
     with:
       environment: sit
+    secrets: inherit
+    environment: dev

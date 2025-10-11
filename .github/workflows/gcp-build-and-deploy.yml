@@ -9,12 +9,13 @@ on:
 
 env:
   GCP_IMAGE_NAME: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REPO }}/${{ vars.CLOUD_RUN_SERVICE }}:${{ github.sha }}
-
+  CLICKUP_API_TOKEN: "${{ secrets.CLICKUP_API_TOKEN }}"
+  CLICKUP_TEAM_ID: "${{ secrets.CLICKUP_TEAM_ID }}"
+  CLICKUP_ROOM_ID: "${{ secrets.CLICKUP_ROOM_ID }}"
 jobs:
   deploy:
     name: Deploy to ${{ inputs.environment }}
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
 
     steps:
       - uses: actions/checkout@v4
@@ -53,6 +54,9 @@ jobs:
             🔫 **Triggered by:** ${{ github.actor }}
             🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           is_assign: false
+          CLICKUP_API_TOKEN: $CLICKUP_API_TOKEN
+          CLICKUP_TEAM_ID: $CLICKUP_TEAM_ID
+          CLICKUP_ROOM_ID: $CLICKUP_ROOM_ID
 
       - name: Notify ClickUp Build Failed
         if: failure()

@@ -10,9 +10,13 @@ jobs:
     uses: ./.github/workflows/gcp-build-and-deploy.yml
     with:
       environment: prod
+    secrets: inherit
+    environment: dev
 
   deploy-psup:
     uses: ./.github/workflows/gcp-build-and-deploy.yml
     needs: deploy-prod
     with:
       environment: psup
+    secrets: inherit
+    environment: dev
