@@ -7,6 +7,6 @@ on:
 
 jobs:
   deploy-dev:
-    uses: ./.github/actions/gcp-build-and-deploy.yml
+    uses: ./.github/actions/gcp-build-and-deploy.yml\
     with:
       environment: dev
