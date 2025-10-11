@@ -1,0 +1,12 @@
+name: Deploy to Cloud Run (DEV)
+
+on:
+  push:
+    branches:
+      - uat
+
+jobs:
+  deploy-uat:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: uat

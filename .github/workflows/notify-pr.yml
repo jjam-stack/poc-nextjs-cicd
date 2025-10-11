@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - develop
-      - qa
+      - sit
       - uat
       - psup
       - main
@@ -38,7 +38,7 @@ jobs:
           elif [ "$ACTION" = "reopened" ]; then
             LABEL="Reopened"
             EXTRA_FIELD="\"group_assignee\": \"${{ vars.CLICKUP_PR_APPROVERS }}\","
-            EXTRA_CONTENT="\n 💬 **Comment:** ${{ github.event.pull_request.body }}"
+            EXTRA_CONTENT="\n 💬 **Comment:** ${{ github.event.pull_request.review_comment.body }}"
           elif [ "$ACTION" = "ready_for_review" ]; then
             LABEL="Ready for Review"
           elif [ "$ACTION" = "edited" ]; then
