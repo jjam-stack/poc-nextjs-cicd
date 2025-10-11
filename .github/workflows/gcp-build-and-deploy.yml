@@ -12,21 +12,14 @@ env:
   CLICKUP_API_TOKEN: "${{ secrets.CLICKUP_API_TOKEN }}"
   CLICKUP_TEAM_ID: "${{ secrets.CLICKUP_TEAM_ID }}"
   CLICKUP_ROOM_ID: "${{ secrets.CLICKUP_ROOM_ID }}"
+  CLICKUP_PR_APPROVERS: "${{ vars.CLICKUP_PR_APPROVERS }}"
 jobs:
-  deploy:
+  authenticate:
     name: Deploy to ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v4
-      - name: Use secret
-        run: |
-          echo "Using secret (masked in logs)"
-          if [ -n "${{ secrets.GCP_PROJECT_ID }}" ]; then
-            echo "Secret is available ✅"
-          else
-            echo "Secret is missing ❌"
-          fi
       - name: Authenticate to GCP
         run: |
           echo "${{ vars.environment }}"
@@ -36,7 +29,13 @@ jobs:
           gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
           gcloud config set run/region ${{ secrets.GCP_REGION }}
           echo "✅ Authenticated and set project [${{ secrets.GCP_PROJECT_ID }}], region [${{ secrets.GCP_REGION }}]"
-
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: authenticate
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
       - name: Build and push image
         run: |
           echo "🏗️ Building and pushing image: $GCP_IMAGE_NAME"
@@ -57,6 +56,7 @@ jobs:
           CLICKUP_API_TOKEN: $CLICKUP_API_TOKEN
           CLICKUP_TEAM_ID: $CLICKUP_TEAM_ID
           CLICKUP_ROOM_ID: $CLICKUP_ROOM_ID
+          CLICKUP_PR_APPROVERS: $CLICKUP_PR_APPROVERS
 
       - name: Notify ClickUp Build Failed
         if: failure()
@@ -70,7 +70,18 @@ jobs:
             🔫 **Triggered by:** ${{ github.actor }}
             🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           is_assign: false
-
+          CLICKUP_API_TOKEN: $CLICKUP_API_TOKEN
+          CLICKUP_TEAM_ID: $CLICKUP_TEAM_ID
+          CLICKUP_ROOM_ID: $CLICKUP_ROOM_ID
+          CLICKUP_PR_APPROVERS: $CLICKUP_PR_APPROVERS
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    needs: 
+      - authenticate
+      - build
+    environment: ${{ inputs.environment }}
+    steps:
       - name: Deploy to Cloud Run
         run: |
           echo "🚀 Deploying to Cloud Run..."
@@ -104,6 +115,10 @@ jobs:
             🔫 **Triggered by:** ${{ github.actor }}
             🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           is_assign: false
+          CLICKUP_API_TOKEN: $CLICKUP_API_TOKEN
+          CLICKUP_TEAM_ID: $CLICKUP_TEAM_ID
+          CLICKUP_ROOM_ID: $CLICKUP_ROOM_ID
+          CLICKUP_PR_APPROVERS: $CLICKUP_PR_APPROVERS
 
       - name: Notify ClickUp Deploy Failed
         if: failure()
@@ -117,3 +132,7 @@ jobs:
             🔫 **Triggered by:** ${{ github.actor }}
             🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           is_assign: false
+          CLICKUP_API_TOKEN: $CLICKUP_API_TOKEN
+          CLICKUP_TEAM_ID: $CLICKUP_TEAM_ID
+          CLICKUP_ROOM_ID: $CLICKUP_ROOM_ID
+          CLICKUP_PR_APPROVERS: $CLICKUP_PR_APPROVERS
