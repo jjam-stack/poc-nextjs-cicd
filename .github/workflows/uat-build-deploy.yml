@@ -11,4 +11,3 @@ jobs:
     with:
       environment: uat
     secrets: inherit
-    environment: dev
