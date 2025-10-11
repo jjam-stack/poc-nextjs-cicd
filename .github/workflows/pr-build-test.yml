@@ -3,7 +3,7 @@ name: Build and Notify
 on:
   pull_request:
     branches:
-      - develop
+      - dev
       - sit
       - uat
       - main
