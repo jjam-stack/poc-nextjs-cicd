@@ -7,12 +7,12 @@ on:
 
 jobs:
   deploy-prod:
-    uses: ./.github/actions/gcp-build-and-deploy.yml@${{ github.ref_name }}
+    uses: ./.github/actions/gcp-build-and-deploy.yml@prod
     with:
       environment: prod
 
   deploy-psup:
-    uses: ./.github/actions/gcp-build-and-deploy.yml@${{ github.ref_name }}
+    uses: ./.github/actions/gcp-build-and-deploy.yml@psup
     needs: deploy-prod
     with:
       environment: psup
