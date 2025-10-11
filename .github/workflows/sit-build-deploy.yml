@@ -7,6 +7,6 @@ on:
 
 jobs:
   deploy-sit:
-    uses: ./.github/actions/gcp-build-and-deploy.yml
+    uses: ./.github/actions/gcp-build-and-deploy.yml@${{ github.ref_name }}
     with:
       environment: sit
