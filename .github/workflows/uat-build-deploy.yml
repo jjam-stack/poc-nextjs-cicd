@@ -7,6 +7,6 @@ on:
 
 jobs:
   deploy-uat:
-    uses: ./.github/actions/gcp-build-and-deploy.yml@uat
+    uses: ./.github/workflows/gcp-build-and-deploy.yml@uat
     with:
       environment: uat
