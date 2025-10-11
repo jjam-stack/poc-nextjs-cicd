@@ -13,7 +13,7 @@ runs:
   using: "composite"
   steps:
     - name: Send notification
-      if: ! ${{ inputs.is_assign }}
+      if: ${{ !inputs.is_assign }}
       shell: bash
       run: |
         echo "📢 Sending message to ClickUp..."
