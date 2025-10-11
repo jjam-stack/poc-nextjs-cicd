@@ -29,6 +29,7 @@ runs:
       shell: bash
       run: |
         echo "📢 Sending message to ClickUp..."
+        echo ${{ inputs.msg }}
         curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ inputs.CLICKUP_TEAM_ID }}/chat/channels/${{ inputs.CLICKUP_ROOM_ID }}/messages" \
           -H "Authorization: ${{ inputs.CLICKUP_API_TOKEN }}" \
           -H "Content-Type: application/json" \
@@ -39,6 +40,7 @@ runs:
       shell: bash
       run: |
         echo "📢 Sending message to ClickUp..."
+        echo ${{ inputs.msg }}
         curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ inputs.CLICKUP_TEAM_ID }}/chat/channels/${{ inputs.CLICKUP_ROOM_ID }}/messages" \
           -H "Authorization: ${{ inputs.CLICKUP_API_TOKEN }}" \
           -H "Content-Type: application/json" \
