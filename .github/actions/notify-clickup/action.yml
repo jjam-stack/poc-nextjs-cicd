@@ -8,6 +8,15 @@ inputs:
   is_assign:
     description: "The flag if this will be assigned to PR approvers"
     required: false
+  CLICKUP_API_TOKEN:
+    description: "ClickUp API Token"
+    required: true
+  CLICKUP_TEAM_ID: 
+    description: "ClickUp Team ID"
+    required: true
+  CLICKUP_ROOM_ID:
+    description: "ClickUp Room ID to send Message"
+    required: true
 
 runs:
   using: "composite"
@@ -17,8 +26,8 @@ runs:
       shell: bash
       run: |
         echo "📢 Sending message to ClickUp..."
-        curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
-          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
+        curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ inputs.CLICKUP_TEAM_ID }}/chat/channels/${{ inputs.CLICKUP_ROOM_ID }}/messages" \
+          -H "Authorization: ${{ inputs.CLICKUP_API_TOKEN }}" \
           -H "Content-Type: application/json" \
           -d "{\"type\": \"message\",\"content\": \"${{ inputs.msg }}\"}" \
         echo "✅ ClickUp notification sent!"
@@ -27,8 +36,8 @@ runs:
       shell: bash
       run: |
         echo "📢 Sending message to ClickUp..."
-        curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
-          -H "Authorization: ${{ secrets.CLICKUP_API_TOKEN }}" \
+        curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ inputs.CLICKUP_TEAM_ID }}/chat/channels/${{ inputs.CLICKUP_ROOM_ID }}/messages" \
+          -H "Authorization: ${{ inputs.CLICKUP_API_TOKEN }}" \
           -H "Content-Type: application/json" \
           -d "{\"type\": \"message\",\"content\": \"${{ inputs.msg }}\", \"group_assignee\": \"${{ vars.CLICKUP_PR_APPROVERS }}\"}" \
         echo "✅ ClickUp notification sent!"

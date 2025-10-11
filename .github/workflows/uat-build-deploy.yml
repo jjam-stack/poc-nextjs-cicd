@@ -10,3 +10,4 @@ jobs:
     uses: ./.github/workflows/gcp-build-and-deploy.yml
     with:
       environment: uat
+    secrets: inherit

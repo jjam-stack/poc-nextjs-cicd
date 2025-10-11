@@ -5,8 +5,10 @@ on:
     branches:
       - dev
 
+
 jobs:
   deploy-dev:
     uses: ./.github/workflows/gcp-build-and-deploy.yml
     with:
       environment: dev
+    secrets: inherit
