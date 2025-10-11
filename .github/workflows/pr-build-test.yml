@@ -1,4 +1,4 @@
-name: Build and Notify
+name: PR Build Test and Notify
 
 on:
   pull_request:

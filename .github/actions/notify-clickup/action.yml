@@ -42,7 +42,7 @@ runs:
         curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ inputs.CLICKUP_TEAM_ID }}/chat/channels/${{ inputs.CLICKUP_ROOM_ID }}/messages" \
           -H "Authorization: ${{ inputs.CLICKUP_API_TOKEN }}" \
           -H "Content-Type: application/json" \
-          -d "{\"type\": \"message\",\"content\": \"${{ inputs.msg }}\", \"group_assignee\": \"${{ vars.CLICKUP_PR_APPROVERS }}\"}" \
+          -d "{\"type\": \"message\",\"content\": \"${{ inputs.msg }}\", \"group_assignee\": \"${{ inputs.CLICKUP_PR_APPROVERS }}\"}" \
         echo "✅ ClickUp notification sent!"
 
           
