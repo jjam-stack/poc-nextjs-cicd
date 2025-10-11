@@ -17,6 +17,9 @@ inputs:
   CLICKUP_ROOM_ID:
     description: "ClickUp Room ID to send Message"
     required: true
+  CLICKUP_PR_APPROVERS:
+    description: "ClickUp Approvers to be assigned to"
+    required: true
 
 runs:
   using: "composite"
