@@ -14,8 +14,8 @@ env:
   CLICKUP_ROOM_ID: "${{ secrets.CLICKUP_ROOM_ID }}"
   CLICKUP_PR_APPROVERS: "${{ vars.CLICKUP_PR_APPROVERS }}"
 jobs:
-  authenticate:
-    name: Deploy to ${{ inputs.environment }}
+  build-deploy:
+    name: GCP Authenticate
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
@@ -29,14 +29,9 @@ jobs:
           gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
           gcloud config set run/region ${{ secrets.GCP_REGION }}
           echo "✅ Authenticated and set project [${{ secrets.GCP_PROJECT_ID }}], region [${{ secrets.GCP_REGION }}]"
-  build:
-    name: Build Docker Image
-    runs-on: ubuntu-latest
-    needs: authenticate
-    environment: ${{ inputs.environment }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build and push image
+      - name: Verify Authentication
+        run: gcloud auth list
+      - name: Build and Push Image
         run: |
           echo "🏗️ Building and pushing image: $GCP_IMAGE_NAME"
           gcloud builds submit --tag ${GCP_IMAGE_NAME}
@@ -44,6 +39,7 @@ jobs:
       - name: Notify ClickUp Build Success
         if: success()
         uses: ./.github/actions/notify-clickup
+        continue-on-error: true
         with:
           msg: |
             ## ✅ **CI Build Passed**
@@ -61,6 +57,7 @@ jobs:
       - name: Notify ClickUp Build Failed
         if: failure()
         uses: ./.github/actions/notify-clickup
+        continue-on-error: true
         with:
           msg: |
             ## ❌ **CI Build Failed**
@@ -74,15 +71,7 @@ jobs:
           CLICKUP_TEAM_ID: $CLICKUP_TEAM_ID
           CLICKUP_ROOM_ID: $CLICKUP_ROOM_ID
           CLICKUP_PR_APPROVERS: $CLICKUP_PR_APPROVERS
-  deploy:
-    name: Deploy to Cloud Run
-    runs-on: ubuntu-latest
-    needs: 
-      - authenticate
-      - build
-    environment: ${{ inputs.environment }}
-    steps:
-      - name: Deploy to Cloud Run
+      - name: Deploy to Cloud Run [${{ inputs.environment }}]
         run: |
           echo "🚀 Deploying to Cloud Run..."
           CMD="gcloud run deploy ${{ vars.CLOUD_RUN_SERVICE }} \
