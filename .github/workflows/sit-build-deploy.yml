@@ -7,6 +7,6 @@ on:
 
 jobs:
   deploy-sit:
-    uses: ./.github/workflows/deploy.yml
+    uses: ../actions/deploy.yml
     with:
       environment: sit

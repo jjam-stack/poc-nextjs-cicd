@@ -3,10 +3,10 @@ name: Deploy to Cloud Run (DEV)
 on:
   push:
     branches:
-      - develop
+      - dev
 
 jobs:
   deploy-dev:
-    uses: ./.github/workflows/deploy.yml
+    uses: ../actions/deploy.yml
     with:
       environment: dev
