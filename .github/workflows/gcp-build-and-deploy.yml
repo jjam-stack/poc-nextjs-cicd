@@ -15,7 +15,7 @@ env:
   CLICKUP_PR_APPROVERS: "${{ vars.CLICKUP_PR_APPROVERS }}"
 jobs:
   build-deploy:
-    name: GCP Authenticate
+    name: Build Deploy to Cloud Run [${{ inputs.environment }}]
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:

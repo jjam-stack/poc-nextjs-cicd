@@ -1,26 +1,21 @@
-# ---- Base ----
-FROM node:20-alpine AS base
+# 1️⃣ Base image
+FROM node:20-alpine
+
+# 2️⃣ Set working directory
 WORKDIR /app
+
+# 3️⃣ Copy dependency files
 COPY package*.json ./
 
-# ---- Dependencies ----
-FROM base AS deps
+# 4️⃣ Install dependencies
 RUN npm install
 
-# ---- Build ----
-FROM deps AS build
+# 5️⃣ Copy the rest of the app
 COPY . .
-RUN npx prisma generate
+
+# 6️⃣ Build the Next.js app
 RUN npm run build
 
-# ---- Run ----
-FROM node:20-alpine AS runner
-WORKDIR /app
-
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/prisma ./prisma
-
-ENV NODE_ENV=production
-
-CMD ["node", "dist/main.js"]
+# 7️⃣ Expose port 3000 and start app
+EXPOSE 3000
+CMD ["npm", "start"]
