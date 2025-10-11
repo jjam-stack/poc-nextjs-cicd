@@ -1,0 +1,18 @@
+name: Deploy to Cloud Run (PROD & PSUP)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-prod:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: prod
+
+  deploy-psup:
+    uses: ./.github/workflows/deploy.yml
+    needs: deploy-prod
+    with:
+      environment: psup

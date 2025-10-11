@@ -1,0 +1,106 @@
+name: Reusable GCP Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+env:
+  GCP_IMAGE_NAME: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REPO }}/${{ vars.CLOUD_RUN_SERVICE }}:${{ github.sha }}
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        run: |
+          echo "${{ secrets.GCP_SA_KEY_BASE64 }}" | base64 --decode > /tmp/key.json
+          gcloud auth activate-service-account --key-file=/tmp/key.json
+          gcloud config set project ${{ vars.GCP_PROJECT_NAME }}
+          gcloud config set run/region ${{ vars.GCP_REGION }}
+          echo "✅ Authenticated and set project [${{ vars.GCP_PROJECT_NAME }}], region [${{ vars.GCP_REGION }}]"
+
+      - name: Build and push image
+        run: |
+          echo "🏗️ Building and pushing image: $GCP_IMAGE_NAME"
+          gcloud builds submit --tag ${GCP_IMAGE_NAME}
+
+      - name: Notify ClickUp Build Success
+        if: success()
+        uses: ./.github/actions/notify-clickup
+        with:
+          msg: |
+            ## ✅ **CI Build Passed**
+            📦 **Repo:** ${{ github.repository }}
+            🌱 **Branch:** ${{ github.ref_name }}
+            📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            🔫 **Triggered by:** ${{ github.actor }}
+            🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          is_assign: false
+
+      - name: Notify ClickUp Build Failed
+        if: failure()
+        uses: ./.github/actions/notify-clickup
+        with:
+          msg: |
+            ## ❌ **CI Build Failed**
+            📦 **Repo:** ${{ github.repository }}
+            🌱 **Branch:** ${{ github.ref_name }}
+            📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            🔫 **Triggered by:** ${{ github.actor }}
+            🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          is_assign: false
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo "🚀 Deploying to Cloud Run..."
+          CMD="gcloud run deploy ${{ vars.CLOUD_RUN_SERVICE }} \
+            --image ${GCP_IMAGE_NAME} \
+            --region ${{ vars.GCP_REGION }} \
+            --platform managed \
+            --cpu ${{ vars.CPU }} \
+            --memory ${{ vars.MEMORY_GB }}Gi \
+            --timeout ${{ vars.TIMEOUT_SECONDS }}s \
+            --min-instances ${{ vars.MIN_INSTANCE }} \
+            --max-instances ${{ vars.MAX_INSTANCE }} \
+            --set-env-vars-file=${{ vars.APP_ENV_FILE }}"
+
+          if [ "${{ vars.GCP_IS_PUBLIC }}" = true ]; then
+            CMD="$CMD --allow-unauthenticated"
+          fi
+
+          echo "🔧 Running: $CMD"
+          eval "$CMD"
+
+      - name: Notify ClickUp Deploy Success
+        if: success()
+        uses: ./.github/actions/notify-clickup
+        with:
+          msg: |
+            ## ✅ **CI Deploy to ${{ inputs.environment }} Successful**
+            📦 **Repo:** ${{ github.repository }}
+            🌱 **Branch:** ${{ github.ref_name }}
+            📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            🔫 **Triggered by:** ${{ github.actor }}
+            🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          is_assign: false
+
+      - name: Notify ClickUp Deploy Failed
+        if: failure()
+        uses: ./.github/actions/notify-clickup
+        with:
+          msg: |
+            ## ❌ **CI Deploy to ${{ inputs.environment }} Failed**
+            📦 **Repo:** ${{ github.repository }}
+            🌱 **Branch:** ${{ github.ref_name }}
+            📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            🔫 **Triggered by:** ${{ github.actor }}
+            🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          is_assign: false

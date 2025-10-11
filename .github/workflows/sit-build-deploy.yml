@@ -1,0 +1,12 @@
+name: Deploy to Cloud Run (DEV)
+
+on:
+  push:
+    branches:
+      - sit
+
+jobs:
+  deploy-sit:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: sit
