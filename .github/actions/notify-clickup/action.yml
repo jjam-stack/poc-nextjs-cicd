@@ -1,0 +1,53 @@
+name: "Notify ClickUp"
+description: "Send a message to ClickUp chat"
+
+inputs:
+  msg:
+    description: "The message text to send"
+    required: true
+  is_assign:
+    description: "The flag if this will be assigned to PR approvers"
+    required: false
+  CLICKUP_API_TOKEN:
+    description: "ClickUp API Token"
+    required: true
+  CLICKUP_TEAM_ID: 
+    description: "ClickUp Team ID"
+    required: true
+  CLICKUP_ROOM_ID:
+    description: "ClickUp Room ID to send Message"
+    required: true
+  CLICKUP_PR_APPROVERS:
+    description: "ClickUp Approvers to be assigned to"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Send notification
+      if: ${{ inputs.is_assign != 'true' }}
+      shell: bash
+      run: |
+        echo "📢 Sending message to ClickUp..."
+        echo "inputs.is_assign=${{ inputs.is_assign }}"
+        ESCAPED_MSG=$(jq -Rn --arg msg "${{ inputs.msg }}" '$msg')
+        
+        curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ inputs.CLICKUP_TEAM_ID }}/chat/channels/${{ inputs.CLICKUP_ROOM_ID }}/messages" \
+          -H "Authorization: ${{ inputs.CLICKUP_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"type\": \"message\",\"content\": ${ESCAPED_MSG}}"
+        echo "✅ ClickUp notification sent!"
+    - name: Send notification And Assign
+      if: ${{ inputs.is_assign == 'true' }}
+      shell: bash
+      run: |
+        echo "📢 Sending message to ClickUp..."
+        ESCAPED_MSG=$(jq -Rn --arg msg "${{ inputs.msg }}" '$msg')
+        echo "{\"type\": \"message\",\"content\": \"${ESCAPED_MSG}\", \"group_assignee\": \"${{ inputs.CLICKUP_PR_APPROVERS }}\"}"
+        curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ inputs.CLICKUP_TEAM_ID }}/chat/channels/${{ inputs.CLICKUP_ROOM_ID }}/messages" \
+          -H "Authorization: ${{ inputs.CLICKUP_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"type\": \"message\",\"content\": ${ESCAPED_MSG}, \"group_assignee\": \"${{ inputs.CLICKUP_PR_APPROVERS }}\"}"
+        echo "✅ ClickUp notification sent!"
+
+          
