@@ -55,7 +55,7 @@ jobs:
                     "id": "458876",
                     "name": "Update"
                   },
-                  "title": "✅ CI Build Passed"
+                  "title": "✅ CI Test-Build Passed"
                 },
                 "content": "* * *\n## ✅ **CI Build Passed**\n\n 📦 **Repository:** ${{ github.repository }}\n 🌱 **Branch:** ${{ github.ref_name }}\n 📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n 🔫 **Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true
@@ -75,7 +75,7 @@ jobs:
                     "id": "458876",
                     "name": "Update"
                   },
-                  "title": "❌ CI Build Failed"
+                  "title": "❌ CI Test-Build Failed"
                 },
                 "content": "* * *\n## ❌ **CI Build Failed**\n\n 📦 **Repository:** ${{ github.repository }}\n 🌱 **Branch:** ${{ github.ref_name }}\n 📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n 🔫 **Triggered by:** ${{ github.actor }}\n\n🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                 "notify_all": true

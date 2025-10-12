@@ -1,4 +1,4 @@
-name: Deploy to Cloud Run (DEV)
+name: Deploy to Cloud Run (SIT)
 
 on:
   push:
