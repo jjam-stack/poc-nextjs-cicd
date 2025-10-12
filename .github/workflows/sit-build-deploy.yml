@@ -1,0 +1,13 @@
+name: Deploy to Cloud Run (SIT)
+
+on:
+  push:
+    branches:
+      - sit
+
+jobs:
+  deploy-sit:
+    uses: ./.github/workflows/gcp-build-and-deploy.yml
+    with:
+      environment: sit
+    secrets: inherit

@@ -7,15 +7,29 @@ on:
       - "hotfix/*"
       - "bugfix/*"
 
+env:
+  CLICKUP_API_TOKEN: "${{ secrets.CLICKUP_API_TOKEN }}"
+  CLICKUP_TEAM_ID: "${{ secrets.CLICKUP_TEAM_ID }}"
+  CLICKUP_ROOM_ID: "${{ secrets.CLICKUP_ROOM_ID }}"
+  CLICKUP_PR_APPROVERS: "${{ vars.CLICKUP_PR_APPROVERS }}"
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
       - name: Send notification to ClickUp Chat
-        run: |
-          curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ secrets.CLICKUP_TEAM_ID }}/chat/channels/${{ secrets.CLICKUP_ROOM_ID }}/messages" \
-          -H "Authorization: ${{ secrets.CLICKUP_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "content": "📌 Push detected on branch `${{ github.ref_name }}` by `${{ github.actor }}`\nRepo: `${{ github.repository }}`\nCommit: `${{ github.sha }}`"
-          }'
+        uses: ./.github/actions/notify-clickup
+        continue-on-error: true
+        with:
+          msg: |
+            * * *
+            ## 📌 **Push Detected**
+            📦 **Repository:** ${{ github.repository }}
+            🌱 **Branch:** ${{ github.ref_name }}
+            📝 **Commit:** ${{ github.sha }}
+            👤 **Pushed by:** ${{ github.actor }}
+            🔗 [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+          is_assign: false
+          CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
+          CLICKUP_TEAM_ID: ${{ env.CLICKUP_TEAM_ID }}
+          CLICKUP_ROOM_ID: ${{ env.CLICKUP_ROOM_ID }}
+          CLICKUP_PR_APPROVERS: ${{ env.CLICKUP_PR_APPROVERS }}

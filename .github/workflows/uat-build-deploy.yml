@@ -1,0 +1,13 @@
+name: Deploy to Cloud Run (UAT)
+
+on:
+  push:
+    branches:
+      - uat
+
+jobs:
+  deploy-uat:
+    uses: ./.github/workflows/gcp-build-and-deploy.yml
+    with:
+      environment: uat
+    secrets: inherit
