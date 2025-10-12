@@ -25,7 +25,7 @@ runs:
   using: "composite"
   steps:
     - name: Send notification
-      if: ${{ inputs.is_assign != "true" }}
+      if: ${{ inputs.is_assign != 'true' }}
       shell: bash
       run: |
         echo "📢 Sending message to ClickUp..."
@@ -38,7 +38,7 @@ runs:
           -d "{\"type\": \"message\",\"content\": ${ESCAPED_MSG}}"
         echo "✅ ClickUp notification sent!"
     - name: Send notification And Assign
-      if: ${{ inputs.is_assign == "true" }}
+      if: ${{ inputs.is_assign == 'true' }}
       shell: bash
       run: |
         echo "📢 Sending message to ClickUp..."
