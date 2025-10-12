@@ -75,23 +75,23 @@ jobs:
       - name: Deploy to Cloud Run [${{ inputs.environment }}]
         run: |
           echo "🚀 Deploying to Cloud Run..."
-          CMD="gcloud run deploy \"${{ vars.CLOUD_RUN_SERVICE }}\" \
-            --image \"${GCP_IMAGE_NAME}\" \
-            --region \"${{ secrets.GCP_REGION }}\" \
+          CMD=(gcloud run deploy "${{ vars.CLOUD_RUN_SERVICE }}" \
+            --image "${GCP_IMAGE_NAME}" \
+            --region "${{ secrets.GCP_REGION }}" \
             --platform managed \
             --cpu ${{ vars.CPU }} \
             --memory ${{ vars.MEMORY_GB }}Gi \
             --timeout ${{ vars.TIMEOUT_SECONDS }}s \
             --min-instances ${{ vars.MIN_INSTANCES }} \
             --max-instances ${{ vars.MAX_INSTANCES }} \
-            --no-wait"
+            --no-wait)
 
           if [ "${{ vars.GCP_IS_PUBLIC }}" = true ]; then
-            CMD="$CMD --allow-unauthenticated"
+            CMD+=(" --allow-unauthenticated")
           fi
 
-          echo "🔧 Running: $CMD"
-          eval "$CMD"
+          echo "🔧 Running: ${CMD[@]}"
+          "${CMD[@]}"
 
       - name: Notify ClickUp Deploy Success
         if: success()
