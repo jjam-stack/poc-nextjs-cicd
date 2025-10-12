@@ -83,8 +83,8 @@ jobs:
             --memory ${{ vars.MEMORY_GB }}Gi \
             --timeout ${{ vars.TIMEOUT_SECONDS }}s \
             --min-instances ${{ vars.MIN_INSTANCES }} \
-            --max-instances ${{ vars.MAX_INSTANCES }}" \
-            --no-wait
+            --max-instances ${{ vars.MAX_INSTANCES }} \
+            --no-wait"
 
           if [ "${{ vars.GCP_IS_PUBLIC }}" = true ]; then
             CMD="$CMD --allow-unauthenticated"
