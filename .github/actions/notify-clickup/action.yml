@@ -25,13 +25,12 @@ runs:
   using: "composite"
   steps:
     - name: Send notification
-      if: ${{ !inputs.is_assign }}
+      if: ${{ inputs.is_assign != "true" }}
       shell: bash
       run: |
         echo "📢 Sending message to ClickUp..."
         echo "inputs.is_assign=${{ inputs.is_assign }}"
         ESCAPED_MSG=$(jq -Rn --arg msg "${{ inputs.msg }}" '$msg')
-        echo "{\"type\": \"message\",\"content\": ${ESCAPED_MSG}}"
         
         curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ inputs.CLICKUP_TEAM_ID }}/chat/channels/${{ inputs.CLICKUP_ROOM_ID }}/messages" \
           -H "Authorization: ${{ inputs.CLICKUP_API_TOKEN }}" \
@@ -39,17 +38,16 @@ runs:
           -d "{\"type\": \"message\",\"content\": ${ESCAPED_MSG}}"
         echo "✅ ClickUp notification sent!"
     - name: Send notification And Assign
-      if: ${{ inputs.is_assign }}
+      if: ${{ inputs.is_assign == "true" }}
       shell: bash
       run: |
         echo "📢 Sending message to ClickUp..."
-        echo "inputs.is_assign=${{ inputs.is_assign }}"
         ESCAPED_MSG=$(jq -Rn --arg msg "${{ inputs.msg }}" '$msg')
         echo "{\"type\": \"message\",\"content\": \"${ESCAPED_MSG}\", \"group_assignee\": \"${{ inputs.CLICKUP_PR_APPROVERS }}\"}"
         curl -X POST "https://api.clickup.com/api/v3/workspaces/${{ inputs.CLICKUP_TEAM_ID }}/chat/channels/${{ inputs.CLICKUP_ROOM_ID }}/messages" \
           -H "Authorization: ${{ inputs.CLICKUP_API_TOKEN }}" \
           -H "Content-Type: application/json" \
-          -d "{\"type\": \"message\",\"content\": \"${ESCAPED_MSG}\", \"group_assignee\": \"${{ inputs.CLICKUP_PR_APPROVERS }}\"}"
+          -d "{\"type\": \"message\",\"content\": ${ESCAPED_MSG}, \"group_assignee\": \"${{ inputs.CLICKUP_PR_APPROVERS }}\"}"
         echo "✅ ClickUp notification sent!"
 
           
