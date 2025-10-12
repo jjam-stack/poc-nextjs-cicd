@@ -137,7 +137,7 @@ jobs:
         if: ${{ inputs.environment == 'prod' }}
         run: |
           echo "🚀 Deploying to Cloud Run..."
-          REVISION_NAME=$( gcloudrun services describe ${{ vars.CLOUD_RUN_SERVICE }} \
+          REVISION_NAME=$( gcloud run services describe ${{ vars.CLOUD_RUN_SERVICE }} \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --region "${{ secrets.GCP_REGION }}" \
             --platform managed \
