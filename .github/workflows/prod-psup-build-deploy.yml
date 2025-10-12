@@ -1,0 +1,20 @@
+name: Deploy to Cloud Run (PROD & PSUP)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-prod:
+    uses: ./.github/workflows/gcp-build-and-deploy.yml
+    with:
+      environment: prod
+    secrets: inherit
+
+  deploy-psup:
+    uses: ./.github/workflows/gcp-build-and-deploy.yml
+    needs: deploy-prod
+    with:
+      environment: psup
+    secrets: inherit
