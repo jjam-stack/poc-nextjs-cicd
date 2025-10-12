@@ -41,11 +41,14 @@ jobs:
         continue-on-error: true
         with:
           msg: |
-            ## ✅ **CI Build Passed**
+            * * *
+            ## ✅ **GCP Build Passed [${{ inputs.environment }}]**
             📦 **Repo:** ${{ github.repository }}
             🌱 **Branch:** ${{ github.ref_name }}
             📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
             🔫 **Triggered by:** ${{ github.actor }}
+            ☁️ **GCP Project:** ${{ secrets.GCP_PROJECT_ID }}
+            🏗️ **Artifact Registry:** ${{ secrets.GCP_ARTIFACT_REPO }}
             🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           is_assign: false
           CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
@@ -59,7 +62,8 @@ jobs:
         continue-on-error: true
         with:
           msg: |
-            ## ❌ **CI Build Failed**
+            * * *
+            ## ❌ **GCP Build Failed [${{ inputs.environment }}]**
             📦 **Repo:** ${{ github.repository }}
             🌱 **Branch:** ${{ github.ref_name }}
             📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
@@ -97,11 +101,14 @@ jobs:
         uses: ./.github/actions/notify-clickup
         with:
           msg: |
-            ## ✅ **CI Deploy to ${{ inputs.environment }} Successful**
+            * * *
+            ## ✅ **GCP Deploy Successful [${{ inputs.environment }}]**
             📦 **Repo:** ${{ github.repository }}
             🌱 **Branch:** ${{ github.ref_name }}
             📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
             🔫 **Triggered by:** ${{ github.actor }}
+            ☁️ **GCP Project:** ${{ secrets.GCP_PROJECT_ID }}
+            🚀 **Cloud Run Service:** ${{ vars.CLOUD_RUN_SERVICE }}
             🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           is_assign: false
           CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
@@ -114,7 +121,8 @@ jobs:
         uses: ./.github/actions/notify-clickup
         with:
           msg: |
-            ## ❌ **CI Deploy to ${{ inputs.environment }} Failed**
+            * * *
+            ## ❌ **GCP Deploy Failed [${{ inputs.environment }}]**
             📦 **Repo:** ${{ github.repository }}
             🌱 **Branch:** ${{ github.ref_name }}
             📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
