@@ -1,0 +1,149 @@
+name: Reusable GCP Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+env:
+  GCP_IMAGE_NAME: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REPO }}/${{ vars.CLOUD_RUN_SERVICE }}:${{ github.sha }}
+  CLICKUP_API_TOKEN: "${{ secrets.CLICKUP_API_TOKEN }}"
+  CLICKUP_TEAM_ID: "${{ secrets.CLICKUP_TEAM_ID }}"
+  CLICKUP_ROOM_ID: "${{ secrets.CLICKUP_ROOM_ID }}"
+  CLICKUP_PR_APPROVERS: "${{ vars.CLICKUP_PR_APPROVERS }}"
+jobs:
+  build-deploy:
+    name: Build Deploy to Cloud Run [${{ inputs.environment }}]
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate to GCP
+        run: |
+          echo "Project ${{ secrets.GCP_PROJECT_ID }}"
+          echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > /tmp/key.json
+          gcloud auth activate-service-account --key-file=/tmp/key.json
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud config set run/region ${{ secrets.GCP_REGION }}
+          echo "✅ Authenticated and set project [${{ secrets.GCP_PROJECT_ID }}], region [${{ secrets.GCP_REGION }}]"
+      - name: Verify Authentication
+        run: gcloud auth list
+      - name: Build and Push Image
+        run: |
+          echo "🏗️ Building and pushing image: $GCP_IMAGE_NAME"
+          gcloud builds submit --tag ${GCP_IMAGE_NAME}
+
+      - name: Notify ClickUp Build Success
+        if: success()
+        uses: ./.github/actions/notify-clickup
+        continue-on-error: true
+        with:
+          msg: |
+            * * *
+            ## ✅ **GCP Build Passed [${{ inputs.environment }}]**
+            📦 **Repo:** ${{ github.repository }}
+            🌱 **Branch:** ${{ github.ref_name }}
+            📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            🔫 **Triggered by:** ${{ github.actor }}
+            ☁️ **GCP Project:** ${{ secrets.GCP_PROJECT_ID }}
+            🏗️ **Artifact Registry:** ${{ secrets.GCP_ARTIFACT_REPO }}
+            🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          is_assign: false
+          CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
+          CLICKUP_TEAM_ID: ${{ env.CLICKUP_TEAM_ID }}
+          CLICKUP_ROOM_ID: ${{ env.CLICKUP_ROOM_ID }}
+          CLICKUP_PR_APPROVERS: ${{ env.CLICKUP_PR_APPROVERS }}
+
+      - name: Notify ClickUp Build Failed
+        if: failure()
+        uses: ./.github/actions/notify-clickup
+        continue-on-error: true
+        with:
+          msg: |
+            * * *
+            ## ❌ **GCP Build Failed [${{ inputs.environment }}]**
+            📦 **Repo:** ${{ github.repository }}
+            🌱 **Branch:** ${{ github.ref_name }}
+            📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            🔫 **Triggered by:** ${{ github.actor }}
+            🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          is_assign: false
+          CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
+          CLICKUP_TEAM_ID: ${{ env.CLICKUP_TEAM_ID }}
+          CLICKUP_ROOM_ID: ${{ env.CLICKUP_ROOM_ID }}
+          CLICKUP_PR_APPROVERS: ${{ env.CLICKUP_PR_APPROVERS }}
+
+      - name: Deploy to Cloud Run [${{ inputs.environment }}]
+        run: |
+          echo "🚀 Deploying to Cloud Run..."
+          CMD="gcloud run deploy ${{ vars.CLOUD_RUN_SERVICE }} \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --image \"${GCP_IMAGE_NAME}\" \
+            --region \"${{ secrets.GCP_REGION }}\" \
+            --platform managed \
+            --cpu ${{ vars.CPU }} \
+            --memory ${{ vars.MEMORY_GB }}Gi \
+            --timeout ${{ vars.TIMEOUT_SECONDS }}s \
+            --min-instances ${{ vars.MIN_INSTANCES }} \
+            --max-instances ${{ vars.MAX_INSTANCES }}"
+
+          if [ "${{ vars.GCP_IS_PUBLIC }}" = true ]; then
+            CMD="$CMD --allow-unauthenticated"
+          fi
+
+          echo "🔧 Running: $CMD"
+          eval "$CMD"
+
+      - name: Notify ClickUp Deploy Success
+        if: success()
+        uses: ./.github/actions/notify-clickup
+        with:
+          msg: |
+            * * *
+            ## ✅ **GCP Deploy Successful [${{ inputs.environment }}]**
+            📦 **Repo:** ${{ github.repository }}
+            🌱 **Branch:** ${{ github.ref_name }}
+            📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            🔫 **Triggered by:** ${{ github.actor }}
+            ☁️ **GCP Project:** ${{ secrets.GCP_PROJECT_ID }}
+            🚀 **Cloud Run Service:** ${{ vars.CLOUD_RUN_SERVICE }}
+            🔗 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          is_assign: false
+          CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
+          CLICKUP_TEAM_ID: ${{ env.CLICKUP_TEAM_ID }}
+          CLICKUP_ROOM_ID: ${{ env.CLICKUP_ROOM_ID }}
+          CLICKUP_PR_APPROVERS: ${{ env.CLICKUP_PR_APPROVERS }}
+
+      - name: Notify ClickUp Deploy Failed
+        if: failure()
+        uses: ./.github/actions/notify-clickup
+        with:
+          msg: |
+            * * *
+            ## ❌ **GCP Deploy Failed [${{ inputs.environment }}]**
+            📦 **Repo:** ${{ github.repository }}
+            🌱 **Branch:** ${{ github.ref_name }}
+            📝 **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            🔫 **Triggered by:** ${{ github.actor }}
+            🔗 [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          is_assign: false
+          CLICKUP_API_TOKEN: ${{ env.CLICKUP_API_TOKEN }}
+          CLICKUP_TEAM_ID: ${{ env.CLICKUP_TEAM_ID }}
+          CLICKUP_ROOM_ID: ${{ env.CLICKUP_ROOM_ID }}
+          CLICKUP_PR_APPROVERS: ${{ env.CLICKUP_PR_APPROVERS }}
+      - name: Add GitHub tag as Cloud Run label
+        if: ${{ inputs.environment == 'prod' }}
+        run: |
+          echo "🚀 Deploying to Cloud Run..."
+          REVISION_NAME=$(gcloud run services describe ${{ vars.CLOUD_RUN_SERVICE }} \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --region \"${{ secrets.GCP_REGION }}\" \
+            --platform managed \
+            --format="value(status.latestReadyRevisionName)")
+          echo "Deployed revision: $REVISION_NAME"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag -a "$REVISION_NAME" -m "Production deploy of commit $GITHUB_SHA to Cloud Run revision $REVISION_NAME"
+          git push origin --tags
