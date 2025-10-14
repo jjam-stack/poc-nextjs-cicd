@@ -137,14 +137,13 @@ jobs:
         if: ${{ inputs.environment == 'prod' }}
         run: |
           echo "🚀 Deploying to Cloud Run..."
-          REVISION_NAME=$(gcloud run services describe ${{ vars.CLOUD_RUN_SERVICE }} \
+          REVISION_NAME=$( gcloud run services describe ${{ vars.CLOUD_RUN_SERVICE }} \
             --project ${{ secrets.GCP_PROJECT_ID }} \
-            --region \"${{ secrets.GCP_REGION }}\" \
+            --region "${{ secrets.GCP_REGION }}" \
             --platform managed \
             --format="value(status.latestReadyRevisionName)")
           echo "Deployed revision: $REVISION_NAME"
-          echo "revision=$REVISION_NAME" >> $GITHUB_OUTPUT
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git tag -a "$GITHUB_OUTPUT" -m "Production deploy of commit $GITHUB_SHA to Cloud Run revision $GITHUB_OUTPUT"
+          git tag -a "$REVISION_NAME" -m "Production deploy of commit $GITHUB_SHA to Cloud Run revision $REVISION_NAME"
           git push origin --tags
